@@ -1,0 +1,9 @@
+{
+  "123456789": {
+    "channel_access": {
+      "tariff_id": "1_month",
+      "purchased_at": "2024-01-15T12:30:45",
+      "expires_at": "2024-02-14T12:30:45"
+    }
+  }
+}

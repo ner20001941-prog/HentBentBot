@@ -1,0 +1,11 @@
+video_sales_bot/
+├── bot.py              # Основной код бота
+├── config.py           # Конфигурация
+├── database.py         # Работа с данными
+├── keyboards.py        # Клавиатуры
+├── videos/            # Папка с видео
+│   ├── video_1.mp4
+│   ├── video_2.mp4
+│   └── ...
+├── user_data.json     # База данных
+└── .env              # Переменные окружения
