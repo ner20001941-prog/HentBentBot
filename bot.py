@@ -7,6 +7,14 @@ from datetime import datetime
 import time
 from datetime import datetime, time as datetime_time  
 
+import logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG
+)
+logger = logging.getLogger(__name__)
+
+
 # Устанавливаем кодировку UTF-8 для Windows
 if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
@@ -800,8 +808,7 @@ def main():
     print("=== DEBUG: Функция main() вызвана ===")
     """Запуск бота"""
     try:
-        print("=== DEBUG: Создаем приложение ===")
-        # Создаем приложение
+        print("🚀 Запуск бота на Railway...")
         application = Application.builder().token(BOT_TOKEN).build()
         
         print("=== DEBUG: Добавляем обработчики команд ===")
@@ -871,13 +878,34 @@ def main():
             allowed_updates=Update.ALL_TYPES,
             drop_pending_updates=True
         )
-        
+        print("✅ Бот запущен, начинаем polling...")
+        application.run_polling(
+            allowed_updates=Update.ALL_TYPES,
+            drop_pending_updates=True,
+            close_loop=False
+        )
     except Exception as e:
-        print(f"=== DEBUG: ОШИБКА: {e} ===")
-        logger.error(f"Ошибка запуска бота: {e}")
+        print(f"❌ Критическая ошибка: {e}")
         import traceback
         traceback.print_exc()
 
 if __name__ == "__main__":
     print("=== DEBUG: Запуск из __main__ ===")
     main()
+
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b'OK')
+    
+    def log_message(self, format, *args):
+        pass  # Отключаем логи
+
+def start_http_server():
+    """Запуск простого HTTP сервера для health checks"""
+    server = HTTPServer(('0.0.0.0', 8000), HealthHandler)
+    server.serve_forever()

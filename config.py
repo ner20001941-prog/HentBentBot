@@ -1,5 +1,10 @@
 import os
 
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    print("❌ ОШИБКА: BOT_TOKEN не установлен!")
+    exit(1)
+
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
 CHANNEL_LINK = os.getenv("CHANNEL_LINK", "")
@@ -30,6 +35,6 @@ TARIFFS = {
 }
 
 print(f"✅ Конфигурация загружена")
-print(f"   Бот токен: {BOT_TOKEN[:10]}...")
-print(f"   Админ ID: {ADMIN_ID}")
+print(f"   Токен: {BOT_TOKEN[:10]}...")
+print(f"   Admin ID: {ADMIN_ID}")
 print(f"   Канал: {CHANNEL_LINK}")
