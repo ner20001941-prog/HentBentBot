@@ -804,11 +804,21 @@ async def backup_database(context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"❌ Ошибка создания бэкапа: {e}")
 
+async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Простая тестовая команда"""
+    print(f"📨 Получена команда ping от {update.effective_user.id}")
+    try:
+        await update.message.reply_text("🏓 Pong! Бот работает!")
+        print("✅ Сообщение отправлено")
+    except Exception as e:
+        print(f"❌ Ошибка отправки: {e}")
+
 def main():
     print("=== DEBUG: Функция main() вызвана ===")
-    """Запуск бота"""
+    
     try:
-        print("🚀 Запуск бота на Railway...")
+        print("=== DEBUG: Создаем приложение ===")
+        # Создаем приложение НОВЫМ способом
         application = Application.builder().token(BOT_TOKEN).build()
         
         print("=== DEBUG: Добавляем обработчики команд ===")
@@ -817,6 +827,7 @@ def main():
         application.add_handler(CommandHandler("help", help_command))
         application.add_handler(CommandHandler("admin_stats", admin_stats))
         application.add_handler(CommandHandler("cleanup", cleanup_command))
+        application.add_handler(CommandHandler("ping", ping))
         
         print("=== DEBUG: Добавляем обработчики оплаты ===")
         # Обработчики оплаты
@@ -833,59 +844,27 @@ def main():
         application.add_handler(CommandHandler("debug", debug_menu))
         
         print("=== DEBUG: Добавляем тестовые команды ===")
-        # ТЕСТОВЫЕ КОМАНДЫ
+        # Тестовые команды
         application.add_handler(CommandHandler("testlink", test_link_command))
         application.add_handler(CommandHandler("givemeaccess", give_me_access))
         application.add_handler(CommandHandler("checkaccess", check_access))
         application.add_handler(CommandHandler("fulltest", full_test))
         application.add_handler(CommandHandler("channelinfo", get_channel_info))
         
-        print("=== DEBUG: Настраиваем фоновые задачи ===")
-        # Настраиваем фоновые задачи для проверки подписок
-        job_queue = application.job_queue
-        
-        if job_queue:
-            # Проверка истекших подписок каждые 6 часов
-            job_queue.run_repeating(
-                check_expired_subscriptions,
-                interval=21600,  # 6 часов в секундах
-                first=30
-            )
-            
-            # Ежедневная задача в 3:00 (УПРОЩЕННЫЙ ВАРИАНТ)
-            # Убедитесь, что функция daily_cleanup существует
-            try:
-                job_queue.run_daily(
-                    daily_cleanup,  # или backup_database
-                    time=time(hour=3),  # Просто указываем час
-                    days=(0, 1, 2, 3, 4, 5, 6)
-                )
-                print("✅ Ежедневная задача настроена")
-            except Exception as e:
-                print(f"⚠️ Не удалось настроить ежедневную задачу: {e}")
-                print("ℹ️ Продолжаем без ежедневной задачи")
-            
-            print("✅ Фоновые задачи настроены")
-        
         print("=== DEBUG: Запускаем polling ===")
         # Запускаем бота
-        logger.info(" Бот запущен! Для остановки нажмите Ctrl+C")
         print("=" * 50)
         print(" Бот запущен успешно!")
         print("=" * 50)
         
+        # НОВЫЙ СПОСОБ запуска для версии 20.x
         application.run_polling(
             allowed_updates=Update.ALL_TYPES,
             drop_pending_updates=True
         )
-        print("✅ Бот запущен, начинаем polling...")
-        application.run_polling(
-            allowed_updates=Update.ALL_TYPES,
-            drop_pending_updates=True,
-            close_loop=False
-        )
+        
     except Exception as e:
-        print(f"❌ Критическая ошибка: {e}")
+        print(f"=== DEBUG: КРИТИЧЕСКАЯ ОШИБКА: {e} ===")
         import traceback
         traceback.print_exc()
 
