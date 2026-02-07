@@ -1,16 +1,17 @@
-BOT_TOKEN = "8554492719:AAEfcl4fTCi3WwXe4HqKilcufJDhIqMdphg"
-ADMIN_ID = 6372922355
-CHANNEL_LINK = "https://t.me/+H4HYnqVsmG03ZmMy" 
-CHANNEL_ID = -1003523554549
+import os
 
-# Тарифы (продаем доступ к каналу)
+BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+CHANNEL_LINK = os.getenv("CHANNEL_LINK", "")
+CHANNEL_ID = int(os.getenv("CHANNEL_ID", "0"))
+
 TARIFFS = {
     "1_month": {
         "name": "🎬 1 месяц доступа",
         "description": "Доступ к приватному каналу на 30 дней",
-        "price": 100,  # звезд
+        "price": 100,
         "days": 30,
-        "type": "channel_access"  # тип: доступ к каналу
+        "type": "channel_access"
     },
     "3_months": {
         "name": "🔥 3 месяца доступа",
