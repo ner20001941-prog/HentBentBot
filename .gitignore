@@ -1,0 +1,12 @@
+# Создайте файл .gitignore
+@"
+__pycache__/
+*.pyc
+*.pyo
+.env
+user_data.json
+.venv/
+venv/
+*.log
+.DS_Store
+"@ | Out-File .gitignore -Encoding UTF8
