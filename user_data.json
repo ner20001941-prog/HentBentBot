@@ -5,5 +5,12 @@
       "purchased_at": "2024-01-15T12:30:45",
       "expires_at": "2024-02-14T12:30:45"
     }
+  },
+  "6372922355": {
+    "channel_access": {
+      "tariff_id": "forever",
+      "purchased_at": "2026-02-07T11:57:53.877936",
+      "expires_at": null
+    }
   }
 }
