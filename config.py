@@ -1,14 +1,19 @@
 import os
-from dotenv import load_dotenv
 
-# Загружаем переменные окружения
-load_dotenv()
+# Для Railway переменные берутся из окружения
+def get_env_var(name, default=None):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value
 
-# Конфигурация бота
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8554492719:AAEfcl4fTCi3WwXe4HqKilcufJDhIqMdphg")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "6372922355"))
-CHANNEL_LINK = os.getenv("CHANNEL_LINK", "https://t.me/+0CveMZwKNsVlY2Ji")
-CHANNEL_ID = os.getenv("CHANNEL_ID")
+BOT_TOKEN = get_env_var("BOT_TOKEN", "8554492719:AAEfcl4fTCi3WwXe4HqKilcufJDhIqMdphg")
+ADMIN_ID = int(get_env_var("ADMIN_ID", "6372922355"))
+CHANNEL_LINK = get_env_var("CHANNEL_LINK", "https://t.me/+0CveMZwKNsVlY2Ji")
+CHANNEL_ID = os.getenv("CHANNEL_ID", "-1003523554549")
+
+# Для Railway
+PORT = int(os.getenv("PORT", 8000))
 
 # Тарифы для доступа к каналу
 TARIFFS = {
