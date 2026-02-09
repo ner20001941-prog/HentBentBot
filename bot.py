@@ -2,43 +2,30 @@
 import sys
 import os
 
-# ====== КРИТИЧЕСКИЙ ПАТЧ ДЛЯ RENDER ======
-# ДО ЛЮБЫХ ИМПОРТОВ TELEGRAM!
-
-# !/usr/bin/env python3
-import sys
-import os
-
-# ====== КРИТИЧЕСКИЙ ПАТЧ ДЛЯ PYTHON 3.13+ ======
-# 1. Патч для pkg_resources (удален в Python 3.13)
+# ====== ПАТЧ ДЛЯ PYTHON 3.13+ ======
+# 1. Патч для pkg_resources (если нет в Python 3.13+)
 try:
     import pkg_resources
 except ImportError:
-    # Создаем фиктивный pkg_resources для APScheduler
-    class Distribution:
+    # Создаем фиктивный модуль
+    class FakeDistribution:
         def __init__(self, version='1.0.0'):
             self.version = version
 
 
     def get_distribution(name):
-        versions = {
-            'setuptools': '82.0.0',
-            'python-telegram-bot': '13.15',
-            'APScheduler': '3.6.3',
-        }
-        return Distribution(versions.get(name, '1.0.0'))
+        return FakeDistribution('1.0.0')
 
 
     class DistributionNotFound(Exception):
         pass
 
 
-    # Создаем модуль
     pkg_resources_module = type(sys)('pkg_resources')
     pkg_resources_module.get_distribution = get_distribution
     pkg_resources_module.DistributionNotFound = DistributionNotFound
     sys.modules['pkg_resources'] = pkg_resources_module
-    print("✅ Патч pkg_resources применен")
+    print("✅ Создан фиктивный pkg_resources")
 
 # 2. Патч для urllib3
 try:
@@ -46,25 +33,10 @@ try:
 
     sys.modules['telegram.vendor.ptb_urllib3.urllib3'] = urllib3
     print("✅ Патч urllib3 применен")
-except:
-    print("⚠️ urllib3 патч не применен")
+except ImportError:
+    print("❌ urllib3 не установлен")
 
-# 3. Патч для six.moves
-try:
-    import six
-
-    if not hasattr(six, 'moves'):
-        class Moves:
-            class http_client:
-                IncompleteRead = Exception
-
-
-        six.moves = Moves()
-    print("✅ Патч six.moves применен")
-except:
-    print("⚠️ six патч не применен")
-
-# 4. Патч для imghdr
+# 3. Патч для imghdr
 try:
     import imghdr
 except ImportError:
@@ -76,79 +48,19 @@ except ImportError:
 
     sys.modules['imghdr'] = ImghdrStub()
     print("✅ Патч imghdr применен")
-# 3. Патч для six.moves
-try:
-    import six
-
-    if not hasattr(six, 'moves'):
-        class Moves:
-            class http_client:
-                IncompleteRead = Exception
-
-
-        six.moves = Moves()
-
-
-    # Создаем фиктивный модуль для telegram.vendor.ptb_urllib3.urllib3.packages
-    class FakePackages:
-        class six:
-            moves = six.moves
-
-
-    fake_packages = FakePackages()
-    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages'] = fake_packages
-    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages.six'] = fake_packages.six
-    print("✅ six.moves патч применен")
-except Exception as e:
-    print(f"⚠️ six патч не применен: {e}")
 # ====== КОНЕЦ ПАТЧА ======
 
 import logging
-from datetime import datetime
-import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
-import json
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
-PORT = int(os.getenv('PORT', 8000))
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     print("❌ BOT_TOKEN не установлен!")
     sys.exit(1)
 
-# Только ПОСЛЕ патчей импортируем telegram
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-print("=" * 60)
-print("🤖 БОТ ЗАПУСКАЕТСЯ")
-print(f"Python: {sys.version}")
-print(f"Порт: {PORT}")
-print("=" * 60)
-
-
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == '/health':
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            response = {"status": "ok", "service": "telegram-bot", "python": sys.version[:5]}
-            self.wfile.write(json.dumps(response).encode())
-        else:
-            self.send_response(404)
-            self.end_headers()
-
-    def log_message(self, format, *args):
-        pass
-
-
-def start_health_server():
-    server = HTTPServer(('0.0.0.0', PORT), HealthHandler)
-    logger.info(f"🌐 Health server на порту {PORT}")
-    server.serve_forever()
 
 
 def start(update: Update, context: CallbackContext):
@@ -160,9 +72,6 @@ def ping(update: Update, context: CallbackContext):
 
 
 def main():
-    health_thread = threading.Thread(target=start_health_server, daemon=True)
-    health_thread.start()
-
     updater = Updater(BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
