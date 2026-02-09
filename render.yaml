@@ -5,3 +5,14 @@ services:
     pythonVersion: "3.9.0"
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_ID
+        sync: false
+      - key: CHANNEL_LINK
+        sync: false
+      - key: PORT
+        value: 8000
