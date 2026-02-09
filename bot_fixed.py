@@ -1,4 +1,36 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# ========== FIX FOR PYTHON 3.14 ==========
+import sys
+
+
+class ImghdrStub:
+    @staticmethod
+    def what(file, h=None):
+        # Минимальная реализация для работы telegram-bot
+        if hasattr(file, 'name'):
+            name = file.name.lower()
+        elif isinstance(file, str):
+            name = file.lower()
+        else:
+            return None
+
+        if name.endswith(('.jpg', '.jpeg')):
+            return 'jpeg'
+        elif name.endswith('.png'):
+            return 'png'
+        elif name.endswith('.gif'):
+            return 'gif'
+        elif name.endswith('.bmp'):
+            return 'bmp'
+        return 'jpeg'  # fallback
+
+
+sys.modules['imghdr'] = ImghdrStub()
+# ========== END FIX ==========
+
+#!/usr/bin/env python3
 
 import os
 import logging
