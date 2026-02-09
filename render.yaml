@@ -1,4 +1,3 @@
-# render.yaml
 services:
   - type: web
     name: telegram-bot
@@ -7,12 +6,4 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     healthCheckPath: /health
-    envVars:
-      - key: BOT_TOKEN
-        sync: false
-      - key: ADMIN_ID
-        sync: false
-      - key: CHANNEL_LINK
-        sync: false
-      - key: PORT
-        value: 8000
+    autoDeploy: true
