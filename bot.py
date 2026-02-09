@@ -1,4 +1,16 @@
+# Патч для импортов
+try:
+    import fix_imports
+except:
+    pass
+
 #!/usr/bin/env python3
+
+# Патч для импортов
+try:
+    import fix_imports
+except:
+    pass
 
 import os
 import logging
