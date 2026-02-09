@@ -5,36 +5,66 @@ import os
 # ====== КРИТИЧЕСКИЙ ПАТЧ ДЛЯ RENDER ======
 # ДО ЛЮБЫХ ИМПОРТОВ TELEGRAM!
 
-# 1. Устанавливаем urllib3 в sys.modules перед импортом telegram
+# !/usr/bin/env python3
+import sys
+import os
+
+# ====== КРИТИЧЕСКИЙ ПАТЧ ДЛЯ PYTHON 3.13+ ======
+# 1. Патч для pkg_resources (удален в Python 3.13)
+try:
+    import pkg_resources
+except ImportError:
+    # Создаем фиктивный pkg_resources для APScheduler
+    class Distribution:
+        def __init__(self, version='1.0.0'):
+            self.version = version
+
+
+    def get_distribution(name):
+        versions = {
+            'setuptools': '82.0.0',
+            'python-telegram-bot': '13.15',
+            'APScheduler': '3.6.3',
+        }
+        return Distribution(versions.get(name, '1.0.0'))
+
+
+    class DistributionNotFound(Exception):
+        pass
+
+
+    # Создаем модуль
+    pkg_resources_module = type(sys)('pkg_resources')
+    pkg_resources_module.get_distribution = get_distribution
+    pkg_resources_module.DistributionNotFound = DistributionNotFound
+    sys.modules['pkg_resources'] = pkg_resources_module
+    print("✅ Патч pkg_resources применен")
+
+# 2. Патч для urllib3
 try:
     import urllib3
 
-    # Создаем полный путь для vendor
-    sys.modules['telegram.vendor.ptb_urllib3'] = type(sys)('ptb_urllib3')
-    sys.modules['telegram.vendor.ptb_urllib3'].urllib3 = urllib3
     sys.modules['telegram.vendor.ptb_urllib3.urllib3'] = urllib3
+    print("✅ Патч urllib3 применен")
+except:
+    print("⚠️ urllib3 патч не применен")
 
-    # Создаем packages.six.moves структуру
+# 3. Патч для six.moves
+try:
     import six
 
+    if not hasattr(six, 'moves'):
+        class Moves:
+            class http_client:
+                IncompleteRead = Exception
 
-    class FakePackages:
-        class six:
-            moves = six.moves
 
+        six.moves = Moves()
+    print("✅ Патч six.moves применен")
+except:
+    print("⚠️ six патч не применен")
 
-    fake_packages = FakePackages()
-    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages'] = fake_packages
-    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages.six'] = fake_packages.six
-
-    print("✅ Патч urllib3 применен")
-except ImportError as e:
-    print(f"❌ Ошибка urllib3: {e}")
-    sys.exit(1)
-except Exception as e:
-    print(f"⚠️ Предупреждение патча: {e}")
-
-# 2. Патч для imghdr
+# 4. Патч для imghdr
 try:
     import imghdr
 except ImportError:
@@ -46,7 +76,6 @@ except ImportError:
 
     sys.modules['imghdr'] = ImghdrStub()
     print("✅ Патч imghdr применен")
-
 # 3. Патч для six.moves
 try:
     import six
