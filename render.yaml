@@ -5,4 +5,3 @@ services:
     pythonVersion: "3.9.0"
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
-    healthCheckPath: /health
