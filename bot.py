@@ -1,3 +1,6 @@
+# Патч для совместимости
+import fix_imports
+
 # Патч для импортов
 try:
     import fix_imports
