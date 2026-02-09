@@ -2,19 +2,37 @@
 import sys
 import os
 
-# ====== ПАТЧ ДО ЛЮБЫХ ИМПОРТОВ ======
-# 1. Устанавливаем urllib3 РАНЬШЕ telegram
+# ====== КРИТИЧЕСКИЙ ПАТЧ ДЛЯ RENDER ======
+# ДО ЛЮБЫХ ИМПОРТОВ TELEGRAM!
+
+# 1. Устанавливаем urllib3 в sys.modules перед импортом telegram
 try:
     import urllib3
 
-    # Патчим ДО импорта telegram
-    sys.modules['telegram.vendor.ptb_urllib3.urllib3'] = urllib3
+    # Создаем полный путь для vendor
     sys.modules['telegram.vendor.ptb_urllib3'] = type(sys)('ptb_urllib3')
     sys.modules['telegram.vendor.ptb_urllib3'].urllib3 = urllib3
-    print("✅ urllib3 патч применен")
+    sys.modules['telegram.vendor.ptb_urllib3.urllib3'] = urllib3
+
+    # Создаем packages.six.moves структуру
+    import six
+
+
+    class FakePackages:
+        class six:
+            moves = six.moves
+
+
+    fake_packages = FakePackages()
+    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages'] = fake_packages
+    sys.modules['telegram.vendor.ptb_urllib3.urllib3.packages.six'] = fake_packages.six
+
+    print("✅ Патч urllib3 применен")
 except ImportError as e:
-    print(f"❌ urllib3 не найден: {e}")
+    print(f"❌ Ошибка urllib3: {e}")
     sys.exit(1)
+except Exception as e:
+    print(f"⚠️ Предупреждение патча: {e}")
 
 # 2. Патч для imghdr
 try:
@@ -27,7 +45,7 @@ except ImportError:
 
 
     sys.modules['imghdr'] = ImghdrStub()
-    print("✅ imghdr патч применен")
+    print("✅ Патч imghdr применен")
 
 # 3. Патч для six.moves
 try:
