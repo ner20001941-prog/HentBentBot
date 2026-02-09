@@ -1,22 +1,42 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+*.so
+
+# Virtual environments
 env/
 venv/
 .venv/
+ENV/
+
+# Environment variables
 .env
 *.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# System
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Bot specific
 user_data.json
 database.db
-.DS_Store
-.idea/
-*.log
-*.bat
-*.bak
-backup_*
-debug*
+
+# Test and debug files
 test*
-thumbnails/
-videos/
+debug*
+check_*
+*_fix.py
+*_backup.py
+*_minimal.py
