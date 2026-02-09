@@ -5,12 +5,7 @@ services:
     pythonVersion: "3.9.0"
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
-    autoDeploy: true
     envVars:
-      - key: BOT_TOKEN
-        sync: false
-      - key: ADMIN_ID
-        sync: false
-      - key: CHANNEL_LINK
-        sync: false
-        value: 8000
+      BOT_TOKEN: "8554492719:AAEfcl4fTCi3WwXe4HqKilcufJDhIqMdphg"
+      ADMIN_ID: "6372922355"
+      CHANNEL_LINK: "https://t.me/+0CveMZwKNsVlY2Ji"
